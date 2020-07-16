@@ -71,5 +71,5 @@ https://github.com/max32002/YuPearl
 
 ## 贊助Max
 
-很高興可以替中華民國美學盡一分心力，如果你覺得這篇文章寫的很好，想打賞Max，贊助方式如下：
+很高興可以替中華民國美學盡一分心力、讓台灣擁有更好的文字風景，如果你覺得這篇文章寫的很好，想打賞Max，贊助方式如下：
 https://max-everyday.com/about/#donate
