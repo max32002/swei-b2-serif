@@ -2,7 +2,7 @@
 
 獅尾B2宋朝字體基於[思源宋體](https://github.com/adobe-fonts/source-han-serif)的三角形轉成半圓形改造，彷彿墨暈或是稍微過曝的效果。支援简体中文、繁體中文、韓文與日文；歡迎大家自由應用、自由優化、自由改作！
 
-「源雲明體JP」、「源雲明體JP」、「思源宋體」、「獅尾B2宋朝」的比較：
+「源雲明體JP」(1)、「源雲明體TW」(2)、「思源宋體」(3)、「獅尾B2宋朝」(4)的比較：
 ![字體比較](https://github.com/max32002/swei-b2-serif/raw/master/preview/compare_noto_serif.png)
 
 和思源宋體一樣，支援7種的字重：
