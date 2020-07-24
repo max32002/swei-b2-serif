@@ -2,12 +2,12 @@
 
 獅尾B2宋朝字體基於[思源宋體](https://github.com/adobe-fonts/source-han-serif)的三角形轉成半圓形改造，彷彿墨暈或是稍微過曝的效果。支援简体中文、繁體中文、韓文與日文；歡迎大家自由應用、自由優化、自由改作！
 
+和思源宋體一樣，支援7種的字重：
+![字重比較](https://github.com/max32002/swei-b2-serif/raw/master/preview/compare_style.png)
+
 ## 與其他字體的比較
 「源雲明體JP」(1)、「源雲明體TW」(2)、「思源宋體」(3)、「獅尾B2宋朝」(4)的比較：
 ![字體比較](https://github.com/max32002/swei-b2-serif/raw/master/preview/compare_noto_serif.png)
-
-和思源宋體一樣，支援7種的字重：
-![字重比較](https://github.com/max32002/swei-b2-serif/raw/master/preview/compare_style.png)
 
 * 在「肉」、「糸」、「女」、「辶」、「食」的筆畫，獅尾比較相似台灣教育部推薦字體筆順，適合教育用途。
 * 在「草」部的筆畫，獅尾是分開的二個部份。
