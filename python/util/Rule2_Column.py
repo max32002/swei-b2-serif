@@ -11,7 +11,7 @@ class Rule(Rule.Rule):
     def __init__(self):
         pass
 
-    def apply(self, spline_dict, resume_idx, inside_stroke_dict,skip_coordinate,skip_coordinate_rule):
+    def apply(self, spline_dict, resume_idx, inside_stroke_dict,apply_rule_log,generate_rule_log):
         redo_travel=False
         check_first_point = False
 
@@ -31,6 +31,7 @@ class Rule(Rule.Rule):
         #print("orig nodes_length:", len(spline_dict['dots']))
         #print("format nodes_length:", nodes_length)
         #print("resume_idx:", resume_idx)
+        #print("Welcome to Rule#2")
 
         rule_need_lines = 4
         fail_code = -1
@@ -43,36 +44,21 @@ class Rule(Rule.Rule):
                 is_debug_mode = False
                 #is_debug_mode = True
 
-                if [format_dict_array[(idx+1)%nodes_length]['x'],format_dict_array[(idx+1)%nodes_length]['y']] in skip_coordinate:
+                detect_code = format_dict_array[(idx+0)%nodes_length]['code']
+                if detect_code in apply_rule_log:
                     if is_debug_mode:
-                        print("match skip idx+1:",format_dict_array[(idx+1)%nodes_length]['code'])
+                        print("match skip apply_rule_log +0:",detect_code)
                         pass
                     continue
 
-                # 要轉換的原來的角，第3點，不能就是我們產生出來的曲線結束點。
-                if [format_dict_array[(idx+2)%nodes_length]['x'],format_dict_array[(idx+2)%nodes_length]['y']] in skip_coordinate:
-                    if is_debug_mode:
-                        print("match skip idx+2:",format_dict_array[(idx+2)%nodes_length]['code'])
-                        pass
-                    continue
-
-                # 要轉換的原來的角，第4點，不能就是我們產生出來的曲線結束點。
-                if [format_dict_array[(idx+3)%nodes_length]['x'],format_dict_array[(idx+3)%nodes_length]['y']] in skip_coordinate:
-                    if is_debug_mode:
-                        print("match skip idx+3:",format_dict_array[(idx+3)%nodes_length]['code'])
-                        pass
-                    continue
-
-                if [format_dict_array[(idx+0)%nodes_length]['x'],format_dict_array[(idx+0)%nodes_length]['y']] in skip_coordinate:
-                    if is_debug_mode:
-                        print("match skip idx+0:",format_dict_array[(idx+0)%nodes_length]['code'])
-                        pass
-                    continue
-
-                if format_dict_array[(idx+0)%nodes_length]['code'] in skip_coordinate_rule:
-                    if is_debug_mode:
-                        print("match skip skip_coordinate_rule +0:",[format_dict_array[(idx+0)%nodes_length]['code']])
-                        pass
+                is_match_detect_code = False
+                for detect_idx in range(4):
+                    detect_code = format_dict_array[(idx+detect_idx)%nodes_length]['code']
+                    if detect_code in generate_rule_log:
+                        if is_debug_mode:
+                            print("match skip generate_rule_log +%d:%s" % (detect_idx, detect_code))
+                            pass
+                if is_match_detect_code:
                     continue
 
                 is_debug_mode = False
@@ -104,6 +90,19 @@ class Rule(Rule.Rule):
                     is_match_pattern = False
                     if format_dict_array[(idx+2)%nodes_length]['t'] == 'l':
                         is_match_pattern = True
+
+                # because Rule#2 run before Rule#1, but this case should apply Rule#1 instead of Rule#2
+                # special case for uni9750 靐 的雷的一
+                # for prefer 橫線.(雖然也會match直線)
+                if nodes_length == 4:
+                    if is_match_pattern:
+                        if format_dict_array[(idx+1)%nodes_length]['distance'] > format_dict_array[(idx+0)%nodes_length]['distance']:
+                            if format_dict_array[(idx+3)%nodes_length]['distance'] > format_dict_array[(idx+2)%nodes_length]['distance']:
+                                if format_dict_array[(idx+1)%nodes_length]['distance'] > format_dict_array[(idx+2)%nodes_length]['distance']:
+                                    if format_dict_array[(idx+3)%nodes_length]['distance'] > format_dict_array[(idx+0)%nodes_length]['distance']:
+                                        if format_dict_array[(idx+1)%nodes_length]['distance'] > self.config.ROUND_OFFSET:
+                                            # pass to let Rule#1 match.
+                                            break
 
                 if is_match_pattern:
                     fail_code = 200
@@ -232,25 +231,29 @@ class Rule(Rule.Rule):
                                 if slide_percent_2 >= SLIDE_2_PERCENT_MIN and slide_percent_2 <= SLIDE_2_PERCENT_MAX:
                                     is_match_pattern = True
 
-                # 做例外排除，滿神奇的，會剛好被match.
+                # 做例外排除.
+                # PS: 請不要判斷 (idx+2) and (idx+3), 因為超過矩形範圍。
                 if is_match_pattern:
+                    fail_code = 250
                     if format_dict_array[(idx+0)%nodes_length]['y_equal_fuzzy']:
                         if format_dict_array[(idx+1)%nodes_length]['y_equal_fuzzy']:
+                            fail_code = 251
                             is_match_pattern = False
                     if format_dict_array[(idx+1)%nodes_length]['y_equal_fuzzy']:
                         if format_dict_array[(idx+2)%nodes_length]['y_equal_fuzzy']:
+                            fail_code = 252
                             is_match_pattern = False
                     if format_dict_array[(idx+2)%nodes_length]['y_equal_fuzzy']:
                         if format_dict_array[(idx+3)%nodes_length]['y_equal_fuzzy']:
+                            fail_code = 253
                             is_match_pattern = False
                     if format_dict_array[(idx+0)%nodes_length]['x_equal_fuzzy']:
                         if format_dict_array[(idx+1)%nodes_length]['x_equal_fuzzy']:
+                            fail_code = 254
                             is_match_pattern = False
                     if format_dict_array[(idx+1)%nodes_length]['x_equal_fuzzy']:
                         if format_dict_array[(idx+2)%nodes_length]['x_equal_fuzzy']:
-                            is_match_pattern = False
-                    if format_dict_array[(idx+2)%nodes_length]['x_equal_fuzzy']:
-                        if format_dict_array[(idx+3)%nodes_length]['x_equal_fuzzy']:
+                            fail_code = 255
                             is_match_pattern = False
 
                 # compare NEXT_DISTANCE_MIN
@@ -323,7 +326,7 @@ class Rule(Rule.Rule):
                     nodes_length = len(format_dict_array)
                     generated_code = format_dict_array[(idx+0)%nodes_length]['code']
                     #print("generated_code#2:", generated_code)
-                    skip_coordinate_rule.append(generated_code)
+                    apply_rule_log.append(generated_code)
 
 
                     is_goto_apply_round = True
@@ -333,21 +336,26 @@ class Rule(Rule.Rule):
                         is_match_d_base_rule, fail_code = self.going_xd_down(format_dict_array,idx)
                         is_goto_apply_round = is_match_d_base_rule
 
+                    # for RAINBOW
+                    if self.config.PROCESS_MODE in ["RAINBOW"]:
+                        is_match_d_base_rule, fail_code = self.going_rainbow_up(format_dict_array,idx)
+                        is_goto_apply_round = is_match_d_base_rule
+
+                    # NUT8, alway do nothing but record the history.
+                    if self.config.PROCESS_MODE in ["NUT8"]:
+                        is_goto_apply_round = False
+                        generated_code = format_dict_array[(idx+1)%nodes_length]['code']
+                        apply_rule_log.append(generated_code)
+
                     if is_goto_apply_round:
-                        center_x,center_y = self.apply_round_transform(format_dict_array,idx)
+                        center_x,center_y = -9999,-9999
+                        #print("self.config.PROCESS_MODE:", self.config.PROCESS_MODE)
+                        if not self.config.PROCESS_MODE in ["3TSANS"]:
+                            center_x,center_y = self.apply_round_transform(format_dict_array,idx,apply_rule_log,generate_rule_log)
+                        else:
+                            center_x,center_y = self.apply_3t_transform(format_dict_array,idx,apply_rule_log,generate_rule_log)
                         #print("center_x,center_y:",center_x,center_y)
                         
-                        # we generated nodes
-                        skip_coordinate.append([center_x,center_y])
-                    
-                    # next_x,y is used for next rule!
-                    # 加了，會造成其他的誤判，因為「點」共用。
-                    #skip_coordinate.append([new_x2,new_y2])
-
-                    # keep the new begin point [FIX]
-                    # 加了，會造成其他的誤判，因為「點」共用。例如「甾」的右上角。
-                    #skip_coordinate.append([new_x1,new_y1])
-
                     redo_travel=True
                     check_first_point = True
                     #resume_idx = idx
@@ -359,4 +367,4 @@ class Rule(Rule.Rule):
             self.reset_first_point(format_dict_array, spline_dict)
 
 
-        return redo_travel, resume_idx, inside_stroke_dict,skip_coordinate,skip_coordinate_rule
+        return redo_travel, resume_idx, inside_stroke_dict,apply_rule_log,generate_rule_log
