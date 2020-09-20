@@ -72,9 +72,8 @@ class Rule():
         bmp_y2 = self.ff_y_to_bmp_y(y2)
         bmp_x3 = self.ff_x_to_bmp_x(x3)
         bmp_y3 = self.ff_y_to_bmp_y(y3)
-        
-        poly_array=[[bmp_x1,bmp_y1],[bmp_x2,bmp_y2],[bmp_x3,bmp_y3]]
 
+        poly_array=[[bmp_x1,bmp_y1],[bmp_x2,bmp_y2],[bmp_x3,bmp_y3]]
 
         bmp_x4 = None
         bmp_y4 = None
@@ -290,7 +289,7 @@ class Rule():
             if debug_mode:
                 print("stroke_width test offset:", x2+previous_offset_stroke_width_x,y2+previous_offset_stroke_width_y,x1+previous_offset_stroke_width_x,y1+previous_offset_stroke_width_y)
                 print("stroke_width_upper:", stroke_width_upper)
-            
+
             # for case: 「屰」線的上方有線，造成取stroke width 取出為最大值。
             if stroke_width_upper >= self.config.STROKE_WIDTH_AVERAGE:
                 stroke_width_upper = self.config.STROKE_WIDTH_AVERAGE
@@ -375,7 +374,7 @@ class Rule():
             bottom=h-margin
             #print("margin:",top,left,right,bottom)
             #print("get_stroke_width:",x0,y0,x1,y1)
-            
+
             # min stroke is excepted.
             STROKE_MATCH_MIN = 25
 
@@ -437,13 +436,13 @@ class Rule():
 
         # 新位置，左下. LB
         previous_left_x,previous_left_y = spline_util.two_point_extend(x0,y0,x1,y1, int(2.0 *self.config.STROKE_WIDTH_AVERAGE))
-        
+
         # 新位置，右上. RT (Endding point)
         tmp_next_extend_x,tmp_next_extend_y=spline_util.two_point_extend(x2,y2,x1,y1, self.config.STROKE_WIDTH_AVERAGE)
         next_extend_x = tmp_next_extend_x - previous_extend_x_offset
         next_extend_y = tmp_next_extend_y - previous_extend_y_offset
 
-        # 新位置，左上. 
+        # 新位置，左上.
         next_left_x = next_extend_x - previous_extend_x_offset
         next_left_y = tmp_next_extend_y - previous_extend_y_offset -previous_extend_y_offset
 
@@ -462,7 +461,7 @@ class Rule():
         self.bmp_x_offset = x_offset
         self.bmp_y_offset = y_offset
 
-    
+
     def reset_first_point(self, format_dict_array, spline_dict):
         spline_x = spline_dict['dots'][0]['x']
         spline_y = spline_dict['dots'][0]['y']
@@ -470,7 +469,7 @@ class Rule():
         spline_code = spline_dict['dots'][0]['code']
 
         nodes_length = len(format_dict_array)
-        # [IMPORTANT] data in "format_dict_array" are not CLEAN! 
+        # [IMPORTANT] data in "format_dict_array" are not CLEAN!
         # please compute data from code.
         old_code = format_dict_array[nodes_length-1]['code']
         old_code_array = old_code.split(' ')
@@ -485,11 +484,11 @@ class Rule():
         if not(spline_x==last_x and spline_y==last_y):
             #print("not match!")
             #print("m old_code_string:", spline_code)
-            
+
             old_code_array = spline_code.split(' ')
             old_code_array[0] = str(last_x)
             old_code_array[1] = str(last_y)
-            
+
             # keep extra infomation cause more error.
             #new_code = ' '.join(old_code_array)
             new_code = "%d %d m 1\n" % (last_x, last_y)
@@ -581,8 +580,8 @@ class Rule():
                 # for _Kappa, Greek Small Letter Kappa
                 # under Unicode Block “CJK Radicals Supplement”
                 if self.is_Before_CJK_Flag:
-                    # allow more 1.10(default) * 1.05(extra) for non-chinese glyph.
-                    allowed_max_width *= 1.05
+                    # allow more 1.10(default) * 1.15(extra) for non-chinese glyph.
+                    allowed_max_width *= 1.15
                     #print("allowed_max_width:", allowed_max_width)
 
                 if distance <= allowed_max_width:
@@ -683,7 +682,7 @@ class Rule():
             next_x,next_y=x2,y2
         else:
             next_x,next_y=spline_util.two_point_extend(x2,y2,x1,y1,-1 * round_length_2)
-        
+
         #if True:
         if False:
             print("orig x0,y0,x1,y1,x2,y2:", orig_x0,orig_y0,x1,y1,orig_x2,orig_y2)
@@ -716,7 +715,7 @@ class Rule():
 
         old_code_string = format_dict_array[(idx+1)%nodes_length]['code']
         old_code_array = old_code_string.split(' ')
-        
+
         if format_dict_array[(idx+1)%nodes_length]['t']=="c":
             # 內縮，造成奇怪的曲線。
             #print("x,y:",format_dict_array[(idx+0)%nodes_length]['x'],format_dict_array[(idx+0)%nodes_length]['y'])
@@ -775,7 +774,7 @@ class Rule():
 
         # update [next next curve]
         # PS: 目前使用的解法問題多多，應該有更好的解法。
-        # PS: 目前使用work around 解法1. 
+        # PS: 目前使用work around 解法1.
         # PS: [TODO]: 連續套用，並產生奇怪曲線的問題，還是可能會發生，而且目前還沒有去檢查和解決。
         if format_dict_array[(idx+2)%nodes_length]['t']=="c":
             old_code_string = format_dict_array[(idx+2)%nodes_length]['code']
@@ -805,7 +804,7 @@ class Rule():
             #print("new distance:", new_distance)
             #print("distance_lost:", distance_lost)
             #print("is_convert_to_l:",is_convert_to_l)
-            
+
             if is_convert_to_l:
                 format_dict_array[(idx+2)%nodes_length]['t']="l"
                 tmp_code_string = ' %d %d l 1\n' % (format_dict_array[(idx+2)%nodes_length]['x'],format_dict_array[(idx+2)%nodes_length]['y'])
@@ -821,7 +820,7 @@ class Rule():
                 # strong offset
                 extend_offset_x = int(old_code_array[1])+ int(x2_offset/1)
                 extend_offset_y = int(old_code_array[2])+ int(y2_offset/1)
-                
+
                 # soft offset
                 #extend_offset_x = int(float(old_code_array[1]))+ int(x2_offset/2)
                 #extend_offset_y = int(float(old_code_array[2]))+ int(y2_offset/2)
@@ -850,7 +849,7 @@ class Rule():
                         virtual_x1y1_distance_remain = spline_util.get_distance(orig_x2,orig_y2,int(old_code_array[1]),int(old_code_array[2]))
                         #print("orig_x2,orig_y2:",orig_x2,orig_y2)
                         #print("virtual_x1y1_distance_remain:",virtual_x1y1_distance_remain)
-                        
+
                         # 需要夠長的空間，都做 offset
                         # PS: 如果 virtual_x1y1_distance_remain 夠長都offset, 會造成筆畫變細。
                         #     參考看看 uni9773,靳的斤.
@@ -886,7 +885,7 @@ class Rule():
         #new_code = ' %d %d %d %d %d %d c 1\n' % (x1, y1, x1, y1, next_x, next_y)
 
         # soft version
-        
+
         new_code = ' %d %d l 1\n' % (next_x, next_y)
         if coner_mode == "CURVE":
             new_code = ' %d %d %d %d %d %d c 1\n' % (previous_recenter_x, previous_recenter_y, next_recenter_x, next_recenter_y, next_x, next_y)
@@ -911,7 +910,7 @@ class Rule():
         # 原本 rule#2 的 skip recode 被洗掉。
         if is_middle_dot_in_skip_rule:
             apply_rule_log.append(new_code)
-            
+
 
         # 因為較短邊 <= round_offset, 需要合併節點。
         if idx >= insert_idx:
@@ -980,18 +979,18 @@ class Rule():
                     idx -= 1
                 nodes_length = len(format_dict_array)
 
-            # 己忘記什麼情況下需要使用到這一段code, 
+            # 己忘記什麼情況下需要使用到這一段code,
             # 但加了之後，會讓 uni7345 獅的帀裡的一個轉角沒套用到效果.
             # 目前先設為False不跑，不跑也有問題，就會可能會多套用效果。
-            
+
             # [TODO]:找到為什麼加這段code,是 uni7D93 經的幺，
             # 在「沒有」做 offset 的情況下，會發生一連串的重覆套用，
-            
+
             # 因為第一點產生完是 clockwise, 第二點原本是 counter clockwise,
             # Rule5/Rule99, 會先用 virtual dot 做比對，會變成銳角。
-            
-            # 解法，是遇到第二段edge=='c'時，clockwise + counter clockwise, 
-            # 這個情況下，做apply_rule_log.append() 
+
+            # 解法，是遇到第二段edge=='c'時，clockwise + counter clockwise,
+            # 這個情況下，做apply_rule_log.append()
             if False:
                 nodes_length = len(format_dict_array)
                 generated_code = format_dict_array[(idx+1)%nodes_length]['code']
@@ -1010,166 +1009,9 @@ class Rule():
 
         return format_dict_array, previous_x, previous_y, next_x, next_y
 
-    # for rectangel version. ex: rule#1,#2,#3
-    def apply_round_transform(self,format_dict_array,idx,apply_rule_log,generate_rule_log):
+    #purpose: 針對 apply round 的 idx+3 == 'curve' 做調整。
+    def adjust_round_idx_3_curve(self,new_x2,new_y2,x2_offset,y2_offset,orig_x3,orig_y3,format_dict_array,idx,apply_rule_log,generate_rule_log):
         nodes_length = len(format_dict_array)
-
-        center_x = int((format_dict_array[(idx+1)%nodes_length]['x']+format_dict_array[(idx+2)%nodes_length]['x'])/2)
-        center_y = int((format_dict_array[(idx+1)%nodes_length]['y']+format_dict_array[(idx+2)%nodes_length]['y'])/2)
-        
-        x0 = format_dict_array[(idx+0)%nodes_length]['x']
-        y0 = format_dict_array[(idx+0)%nodes_length]['y']
-        x1 = format_dict_array[(idx+1)%nodes_length]['x']
-        y1 = format_dict_array[(idx+1)%nodes_length]['y']
-        x2 = format_dict_array[(idx+2)%nodes_length]['x']
-        y2 = format_dict_array[(idx+2)%nodes_length]['y']
-        x3 = format_dict_array[(idx+3)%nodes_length]['x']
-        y3 = format_dict_array[(idx+3)%nodes_length]['y']
-
-        # keep original value.
-        orig_x0 = x0
-        orig_y0 = y0
-        orig_x3 = x3
-        orig_y3 = y3
-
-        # PS: in this rule, the value is fixed.
-        #     but in Rule5, this value will be change.
-        orig_x2 = x2
-        orig_y2 = y2
-
-        # 使用較短的邊。
-        round_length_1 = self.config.ROUND_OFFSET
-        if format_dict_array[(idx+0)%nodes_length]['distance'] < self.config.ROUND_OFFSET:
-            round_length_1 = format_dict_array[(idx+0)%nodes_length]['distance']
-        round_length_2 = self.config.ROUND_OFFSET
-        if format_dict_array[(idx+2)%nodes_length]['distance'] < self.config.ROUND_OFFSET:
-            round_length_2 = format_dict_array[(idx+2)%nodes_length]['distance']
-
-        # use more close coordinate.
-        new_x1, new_y1 = 0,0
-        if format_dict_array[(idx+1)%nodes_length]['t']=='c':
-            x_from = x0
-            y_from = y0
-            x_center = format_dict_array[(idx+1)%nodes_length]['x2']
-            y_center = format_dict_array[(idx+1)%nodes_length]['y2']
-            x0,y0 = self.compute_curve_new_xy(x_from,y_from,x_center,y_center,x1,y1,round_length_1)
-            # 應該是可以直接使用 x0,y0才對，但目前還有問題。
-            #new_x1, new_y1 = x0, y0
-            new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1,-1 * round_length_1)
-        else:
-            new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1,-1 * round_length_1)
-
-        new_x2, new_y2 = 0,0
-        if format_dict_array[(idx+3)%nodes_length]['t']=='c':
-            x_from = x3
-            y_from = y3
-            x_center = format_dict_array[(idx+3)%nodes_length]['x1']
-            y_center = format_dict_array[(idx+3)%nodes_length]['y1']
-            #print("x_from,y_from,x_center,y_center,x2,y2,round_length_2:",x_from,y_from,x_center,y_center,x2,y2,round_length_2)
-            x3,y3 = self.compute_curve_new_xy(x_from,y_from,x_center,y_center,x2,y2,round_length_2)
-            #print("x3,y3:",x3,y3)
-            # 應該是可以直接使用 x3,y3才對，但目前還有問題。
-            #new_x2, new_y2 = x3, y3
-            new_x2, new_y2 = spline_util.two_point_extend(x3,y3,x2,y2,-1 * round_length_2)
-        else:
-            new_x2, new_y2 = spline_util.two_point_extend(x3,y3,x2,y2,-1 * round_length_2)
-
-        # compute edge 1 prefer.
-        prefer_orig_1 = False
-        if False:
-            clockwise1 = self.check_clockwise([[orig_x0,orig_y0],[x1,y1],[orig_x2,orig_y2]])
-            clockwise1V = None
-            if format_dict_array[(idx+1)%nodes_length]['t']=='l':
-                clockwise1V = clockwise1
-            else:
-                x_center = format_dict_array[(idx+1)%nodes_length]['x2']
-                y_center = format_dict_array[(idx+1)%nodes_length]['y2']
-                clockwise1V = self.check_clockwise([[orig_x0,orig_y0],[x1,y1],[x_center,y_center]])
-            if clockwise1V == clockwise1:
-                prefer_orig_1 = True
-            
-            if False:
-                print("clockwise1:", clockwise1)
-                print("clockwise1V:", clockwise1V)
-
-        # compute edge 3 prefer.
-        prefer_orig_3 = False
-        if False:
-            clockwise3 = self.check_clockwise([[x1,y1],[orig_x2,orig_y2],[orig_x3,orig_y3]])
-            clockwise3V = None
-            if format_dict_array[(idx+3)%nodes_length]['t']=='l':
-                clockwise3V = clockwise3
-            else:
-                x_center = format_dict_array[(idx+3)%nodes_length]['x1']
-                y_center = format_dict_array[(idx+3)%nodes_length]['y1']
-                clockwise3V = self.check_clockwise([[orig_x2,orig_y2],[orig_x3,orig_y3],[x_center,y_center]])
-            if clockwise3V == clockwise3:
-                prefer_orig_3 = True
-
-            if False:
-                print("clockwise3:", clockwise3)
-                print("clockwise3V:", clockwise3V)
-
-        #if True:
-        if False:
-            print("center x,y:", center_x, center_y)
-
-            print("orig orig_x0,orig_y0:", orig_x0,orig_y0)
-            print("new x0,y0 goto x1,y1:", x0,y0, x1,y1)
-            print("compute new_x1, new_y1:", new_x1, new_y1)
-
-            print("orig_x3,orig_y3:",orig_x3,orig_y3)
-            print("x2,y2 goto x3,y3:",x2,y2, x3,y3)
-            print("compute new_x2, new_y2:", new_x2, new_y2)
-
-            #print("prefer_orig_1:",prefer_orig_1)
-            #print("prefer_orig_3:",prefer_orig_3)
-
-        # re-center again.
-        if False:
-            if format_dict_array[(idx+1)%nodes_length]['t']=='c':
-                x_center = format_dict_array[(idx+1)%nodes_length]['x2']
-                y_center = format_dict_array[(idx+1)%nodes_length]['y2']
-                if prefer_orig_1:
-                    x_center = (orig_x0 + x1)/2
-                    y_center = (orig_y0 + y1)/2
-                new_x_center, new_y_center = spline_util.two_point_extend(x_center,y_center,x1,y1,-1 * round_length_1)
-                new_x1, new_y1 = int((new_x_center+new_x1)/2) , int((new_y_center+new_y1)/2)
-        
-        # re-center again.
-        if False:
-            if format_dict_array[(idx+3)%nodes_length]['t']=='c':
-                x_center = format_dict_array[(idx+3)%nodes_length]['x1']
-                y_center = format_dict_array[(idx+3)%nodes_length]['y1']
-                #print("dot+3:x1,y1:", x_center, y_center)
-                if prefer_orig_3:
-                    x_center = (orig_x3 + x2)/2
-                    y_center = (orig_y3 + y2)/2
-                    #print("dot+3 middle:x1,y1:", x_center, y_center)
-                new_x_center, new_y_center = spline_util.two_point_extend(x_center,y_center,x2,y2,-1 * round_length_2)
-                #print("x2,y2:",x2,y2)
-                #print("orig_x2,orig_y2:",orig_x2,orig_y2)
-                #print("new_x_center, new_y_center:",new_x_center, new_y_center)
-                new_x2, new_y2 = int((new_x_center+new_x2)/2) , int((new_y_center+new_y2)/2)
-                #print("new_x2, new_y2(after):",new_x2, new_y2)
-
-        x1_offset = new_x1 - x1
-        y1_offset = new_y1 - y1
-        x2_offset = new_x2 - x2
-        y2_offset = new_y2 - y2
-
-        #if True:
-        if False:
-            print("new x1,y1:", new_x1, new_y1)
-            print("new x2,y2:", new_x2, new_y2)
-
-
-        # re-center again
-        # see alpha Y (id.319, it's not work!)
-        #center_y = int((new_y1+new_y2)/2)
-
-        # 下一個點，可能在內縮後的右邊。
-        # 這個會產生「奇怪的曲線」
         if format_dict_array[(idx+3)%nodes_length]['t']=="c":
             old_code_string = format_dict_array[(idx+3)%nodes_length]['code']
             old_code_array = old_code_string.split(' ')
@@ -1190,7 +1032,7 @@ class Rule():
                 # strong offset
                 #extend_offset_x = int(old_code_array[1])+ int(x2_offset/1)
                 #extend_offset_y = int(old_code_array[2])+ int(y2_offset/1)
-                
+
                 # soft offset
                 extend_offset_x = int(float(old_code_array[1]))+ int(x2_offset/2)
                 extend_offset_y = int(float(old_code_array[2]))+ int(y2_offset/2)
@@ -1262,97 +1104,277 @@ class Rule():
             self.apply_code(format_dict_array,(idx+3)%nodes_length)
             #print("before code:", old_code_string)
             #print("new_code code:", new_code)
+    
+    #purpose: 移動 round 的 idx+1 x,y 坐標。
+    def move_round_idx_1_position(self, is_apply_inside_direction, new_x1,new_y1,x1_offset,y1_offset,format_dict_array,idx,apply_rule_log,generate_rule_log):
+        nodes_length = len(format_dict_array)
 
-        # update #1
-        #print("self.config.PROCESS_MODE:", self.config.PROCESS_MODE)
+        old_code_string = format_dict_array[(idx+1)%nodes_length]['code']
+        old_code_array = old_code_string.split(' ')
+
+        if format_dict_array[(idx+1)%nodes_length]['t']=='c':
+            # for 辶部，的凹洞.
+            # PS: 這是檢測水平線，還無法處理斜線型的凹洞。
+            is_prefer_y1_straight = False
+
+            if is_apply_inside_direction:
+                #print("-1 y_equal_fuzzy:", format_dict_array[(idx-1+nodes_length)%nodes_length]['y_equal_fuzzy'])
+                if format_dict_array[(idx-1+nodes_length)%nodes_length]['y_equal_fuzzy']:
+                    if format_dict_array[(idx-1+nodes_length)%nodes_length]['x_direction'] == format_dict_array[(idx+0+nodes_length)%nodes_length]['x_direction']:
+                        if abs(format_dict_array[(idx+1+nodes_length)%nodes_length]['y2']-format_dict_array[(idx-1+nodes_length)%nodes_length]['y'])<=3:
+                            is_prefer_y1_straight = True
+
+            new_distance = spline_util.get_distance(new_x1,new_y1,format_dict_array[(idx+0)%nodes_length]['x'],format_dict_array[(idx+0)%nodes_length]['y'])
+
+            is_convert_to_l = False
+
+            if new_distance <= 35:
+                is_convert_to_l = True
+
+            if is_convert_to_l:
+                format_dict_array[(idx+1)%nodes_length]['t']="l"
+                tmp_code_string = ' %d %d l 1\n' % (new_x1,new_y1)
+                old_code_array = tmp_code_string.split(' ')
+            else:
+                # 內縮，造成奇怪的曲線。
+                # strong offset
+                #extend_offset_x = int(old_code_array[1])+ int(x2_offset/1)
+                #extend_offset_y = int(old_code_array[2])+ int(y2_offset/1)
+
+                # soft offset
+                extend_offset_x = int(float(old_code_array[3]))+ int(x1_offset/2)
+                extend_offset_y = int(float(old_code_array[4]))+ int(y1_offset/2)
+
+                # 讓線變直，for 辶部。
+                if is_prefer_y1_straight:
+                    extend_offset_y = int(float(old_code_array[4]))
+
+                is_virtual_dot_need_offset = False
+                #is_virtual_dot_need_offset = True
+
+                if is_virtual_dot_need_offset:
+                    # 如果 x1,y1=x2,y2, 順便調整另一組。
+                    if old_code_array[1] == old_code_array[3] and old_code_array[2] == old_code_array[4]:
+                        old_code_array[1] = str(extend_offset_x)
+                        old_code_array[2] = str(extend_offset_y)
+
+                    old_code_array[3] = str(extend_offset_x)
+                    old_code_array[4] = str(extend_offset_y)
+
+                # 如果 x1,y1=x,y, 順便調整另一組。
+                if old_code_array[1] == old_code_array[5] and old_code_array[2] == old_code_array[6]:
+                    old_code_array[1] = str(new_x1)
+                    old_code_array[2] = str(new_y1)
+
+                # 如果 x2,y2=x,y, 順便調整另一組。
+                if old_code_array[3] == old_code_array[5] and old_code_array[4] == old_code_array[6]:
+                    old_code_array[3] = str(new_x1)
+                    old_code_array[4] = str(new_y1)
+
+                old_code_array[5] = str(new_x1)
+                old_code_array[6] = str(new_y1)
+        else:
+            # not is 'c'
+            old_code_array[1] = str(new_x1)
+            old_code_array[2] = str(new_y1)
+        new_code = ' '.join(old_code_array)
+        target_index = (idx+1)%nodes_length
+        format_dict_array[target_index]['code'] = new_code
+        self.apply_code(format_dict_array,(idx+1)%nodes_length)
+
+        # 增加內縮後的點，為不處理的項目。
+        apply_rule_log.append(new_code)
+        generate_rule_log.append(new_code)
+
+        #if True:
+        if False:
+            print("old_code_string:", old_code_string)
+            print("is_prefer_y1_straight:", is_prefer_y1_straight)
+            print("+1 idx:%d, code:%s" % (target_index, new_code))
+
+    # for rectangel version. ex: rule#1,#2,#3
+    def apply_round_transform(self,format_dict_array,idx,apply_rule_log,generate_rule_log):
+        nodes_length = len(format_dict_array)
+
+        center_x = int((format_dict_array[(idx+1)%nodes_length]['x']+format_dict_array[(idx+2)%nodes_length]['x'])/2)
+        center_y = int((format_dict_array[(idx+1)%nodes_length]['y']+format_dict_array[(idx+2)%nodes_length]['y'])/2)
+
+        x0 = format_dict_array[(idx+0)%nodes_length]['x']
+        y0 = format_dict_array[(idx+0)%nodes_length]['y']
+        x1 = format_dict_array[(idx+1)%nodes_length]['x']
+        y1 = format_dict_array[(idx+1)%nodes_length]['y']
+        x2 = format_dict_array[(idx+2)%nodes_length]['x']
+        y2 = format_dict_array[(idx+2)%nodes_length]['y']
+        x3 = format_dict_array[(idx+3)%nodes_length]['x']
+        y3 = format_dict_array[(idx+3)%nodes_length]['y']
+
+        # keep original value.
+        orig_x0 = x0
+        orig_y0 = y0
+        orig_x3 = x3
+        orig_y3 = y3
+
+        # PS: in this rule, the value is fixed.
+        #     but in Rule5, this value will be change.
+        orig_x2 = x2
+        orig_y2 = y2
+
+        # 使用較短的邊。
+        round_length_1 = self.config.ROUND_OFFSET
+        if format_dict_array[(idx+0)%nodes_length]['distance'] < round_length_1:
+            round_length_1 = format_dict_array[(idx+0)%nodes_length]['distance']
+        round_length_2 = self.config.ROUND_OFFSET
+        if format_dict_array[(idx+2)%nodes_length]['distance'] < round_length_2:
+            round_length_2 = format_dict_array[(idx+2)%nodes_length]['distance']
+
+        # default apply inside direction.
+        is_apply_inside_direction = True
+        if self.config.PROCESS_MODE in ["BAT"]:
+            is_apply_inside_direction = False
+
+        # use more close coordinate.
+        new_x1, new_y1 = 0,0
+        if format_dict_array[(idx+1)%nodes_length]['t']=='c':
+            x_from = x0
+            y_from = y0
+            x_center = format_dict_array[(idx+1)%nodes_length]['x2']
+            y_center = format_dict_array[(idx+1)%nodes_length]['y2']
+            x0,y0 = self.compute_curve_new_xy(x_from,y_from,x_center,y_center,x1,y1,round_length_1)
+            # 應該是可以直接使用 x0,y0才對，但目前還有問題。
+            #new_x1, new_y1 = x0, y0
+            if is_apply_inside_direction:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1,-1 * round_length_1)
+            else:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1, round_length_1)
+        else:
+            if is_apply_inside_direction:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1,-1 * round_length_1)
+            else:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1, round_length_1)
+
+        new_x2, new_y2 = 0,0
+        if format_dict_array[(idx+3)%nodes_length]['t']=='c':
+            x_from = x3
+            y_from = y3
+            x_center = format_dict_array[(idx+3)%nodes_length]['x1']
+            y_center = format_dict_array[(idx+3)%nodes_length]['y1']
+            #print("x_from,y_from,x_center,y_center,x2,y2,round_length_2:",x_from,y_from,x_center,y_center,x2,y2,round_length_2)
+            x3,y3 = self.compute_curve_new_xy(x_from,y_from,x_center,y_center,x2,y2,round_length_2)
+            #print("x3,y3:",x3,y3)
+            # 應該是可以直接使用 x3,y3才對，但目前還有問題。
+            #new_x2, new_y2 = x3, y3
+            if is_apply_inside_direction:
+                new_x2, new_y2 = spline_util.two_point_extend(x3,y3,x2,y2,-1 * round_length_2)
+            else:
+                new_x2, new_y2 = spline_util.two_point_extend(x3,y3,x2,y2, round_length_2)
+        else:
+            if is_apply_inside_direction:
+                new_x2, new_y2 = spline_util.two_point_extend(x3,y3,x2,y2,-1 * round_length_2)
+            else:
+                new_x2, new_y2 = spline_util.two_point_extend(x3,y3,x2,y2, round_length_2)
+
+        # compute edge 1 prefer.
+        prefer_orig_1 = False
+        if False:
+            clockwise1 = self.check_clockwise([[orig_x0,orig_y0],[x1,y1],[orig_x2,orig_y2]])
+            clockwise1V = None
+            if format_dict_array[(idx+1)%nodes_length]['t']=='l':
+                clockwise1V = clockwise1
+            else:
+                x_center = format_dict_array[(idx+1)%nodes_length]['x2']
+                y_center = format_dict_array[(idx+1)%nodes_length]['y2']
+                clockwise1V = self.check_clockwise([[orig_x0,orig_y0],[x1,y1],[x_center,y_center]])
+            if clockwise1V == clockwise1:
+                prefer_orig_1 = True
+
+            if False:
+                print("clockwise1:", clockwise1)
+                print("clockwise1V:", clockwise1V)
+
+        # compute edge 3 prefer.
+        prefer_orig_3 = False
+        if False:
+            clockwise3 = self.check_clockwise([[x1,y1],[orig_x2,orig_y2],[orig_x3,orig_y3]])
+            clockwise3V = None
+            if format_dict_array[(idx+3)%nodes_length]['t']=='l':
+                clockwise3V = clockwise3
+            else:
+                x_center = format_dict_array[(idx+3)%nodes_length]['x1']
+                y_center = format_dict_array[(idx+3)%nodes_length]['y1']
+                clockwise3V = self.check_clockwise([[orig_x2,orig_y2],[orig_x3,orig_y3],[x_center,y_center]])
+            if clockwise3V == clockwise3:
+                prefer_orig_3 = True
+
+            if False:
+                print("clockwise3:", clockwise3)
+                print("clockwise3V:", clockwise3V)
+
+        #if True:
+        if False:
+            print("center x,y:", center_x, center_y)
+
+            print("orig orig_x0,orig_y0:", orig_x0,orig_y0)
+            print("new x0,y0 goto x1,y1:", x0,y0, x1,y1)
+            print("compute new_x1, new_y1:", new_x1, new_y1)
+
+            print("orig_x3,orig_y3:",orig_x3,orig_y3)
+            print("x2,y2 goto x3,y3:",x2,y2, x3,y3)
+            print("compute new_x2, new_y2:", new_x2, new_y2)
+
+            #print("prefer_orig_1:",prefer_orig_1)
+            #print("prefer_orig_3:",prefer_orig_3)
+
+        # re-center again.
+        if False:
+            if format_dict_array[(idx+1)%nodes_length]['t']=='c':
+                x_center = format_dict_array[(idx+1)%nodes_length]['x2']
+                y_center = format_dict_array[(idx+1)%nodes_length]['y2']
+                if prefer_orig_1:
+                    x_center = (orig_x0 + x1)/2
+                    y_center = (orig_y0 + y1)/2
+                new_x_center, new_y_center = spline_util.two_point_extend(x_center,y_center,x1,y1,-1 * round_length_1)
+                new_x1, new_y1 = int((new_x_center+new_x1)/2) , int((new_y_center+new_y1)/2)
+
+        # re-center again.
+        if False:
+            if format_dict_array[(idx+3)%nodes_length]['t']=='c':
+                x_center = format_dict_array[(idx+3)%nodes_length]['x1']
+                y_center = format_dict_array[(idx+3)%nodes_length]['y1']
+                #print("dot+3:x1,y1:", x_center, y_center)
+                if prefer_orig_3:
+                    x_center = (orig_x3 + x2)/2
+                    y_center = (orig_y3 + y2)/2
+                    #print("dot+3 middle:x1,y1:", x_center, y_center)
+                new_x_center, new_y_center = spline_util.two_point_extend(x_center,y_center,x2,y2,-1 * round_length_2)
+                #print("x2,y2:",x2,y2)
+                #print("orig_x2,orig_y2:",orig_x2,orig_y2)
+                #print("new_x_center, new_y_center:",new_x_center, new_y_center)
+                new_x2, new_y2 = int((new_x_center+new_x2)/2) , int((new_y_center+new_y2)/2)
+                #print("new_x2, new_y2(after):",new_x2, new_y2)
+
+        x1_offset = new_x1 - x1
+        y1_offset = new_y1 - y1
+        x2_offset = new_x2 - x2
+        y2_offset = new_y2 - y2
+
+        #if True:
+        if False:
+            print("new x1,y1:", new_x1, new_y1)
+            print("new x2,y2:", new_x2, new_y2)
+
+        # 下一個點，可能在內縮後的右邊。
+        # 這個會產生「奇怪的曲線」
+        if is_apply_inside_direction:
+            # PS: 目前 round idx+3 和 idx+1 的處理方式不太一樣，但理論上應該要一樣。
+            self.adjust_round_idx_3_curve(new_x2,new_y2,x2_offset,y2_offset,orig_x3,orig_y3,format_dict_array,idx,apply_rule_log,generate_rule_log)
 
         is_halfmoon_sharp = False
         if self.config.PROCESS_MODE in ["HALFMOON","TOOTHPASTE"]:
             is_halfmoon_sharp = True
 
         if not is_halfmoon_sharp:
-            # for 辶部，的凹洞.
-            # PS: 這是檢測水平線，還無法處理斜線型的凹洞。
-            is_prefer_y1_straight = False
-            #print("-1 y_equal_fuzzy:", format_dict_array[(idx-1+nodes_length)%nodes_length]['y_equal_fuzzy'])
-            if format_dict_array[(idx-1+nodes_length)%nodes_length]['y_equal_fuzzy']:
-                if format_dict_array[(idx-1+nodes_length)%nodes_length]['x_direction'] == format_dict_array[(idx+0+nodes_length)%nodes_length]['x_direction']:
-                    if format_dict_array[(idx+1+nodes_length)%nodes_length]['t']=='c':
-                        if abs(format_dict_array[(idx+1+nodes_length)%nodes_length]['y2']-format_dict_array[(idx-1+nodes_length)%nodes_length]['y'])<=3:
-                            is_prefer_y1_straight = True
-
-
-            #print("self.config.PROCESS_MODE in [GOTHIC]")
-            format_dict_array[(idx+1)%nodes_length]['x']= new_x1
-            format_dict_array[(idx+1)%nodes_length]['y']= new_y1
-
-            old_code_string = format_dict_array[(idx+1)%nodes_length]['code']
-            old_code_array = old_code_string.split(' ')
-
-            if format_dict_array[(idx+1)%nodes_length]['t']=='c':
-                new_distance = spline_util.get_distance(new_x1,new_y1,format_dict_array[(idx+0)%nodes_length]['x'],format_dict_array[(idx+0)%nodes_length]['y'])
-
-                is_convert_to_l = False
-
-                if new_distance <= 35:
-                    is_convert_to_l = True
-
-                if is_convert_to_l:
-                    format_dict_array[(idx+1)%nodes_length]['t']="l"
-                    tmp_code_string = ' %d %d l 1\n' % (new_x1,new_y1)
-                    old_code_array = tmp_code_string.split(' ')
-                else:
-                    # 內縮，造成奇怪的曲線。
-                    # strong offset
-                    #extend_offset_x = int(old_code_array[1])+ int(x2_offset/1)
-                    #extend_offset_y = int(old_code_array[2])+ int(y2_offset/1)
-                    
-                    # soft offset
-                    extend_offset_x = int(float(old_code_array[3]))+ int(x1_offset/2)
-                    extend_offset_y = int(float(old_code_array[4]))+ int(y1_offset/2)
-
-                    # 讓線變直，for 辶部。
-                    if is_prefer_y1_straight:
-                        extend_offset_y = int(float(old_code_array[4]))
-
-                    is_virtual_dot_need_offset = False
-                    #is_virtual_dot_need_offset = True
-
-                    if is_virtual_dot_need_offset:
-                        # 如果 x1,y1=x2,y2, 順便調整另一組。
-                        if old_code_array[1] == old_code_array[3] and old_code_array[2] == old_code_array[4]:
-                            old_code_array[1] = str(extend_offset_x)
-                            old_code_array[2] = str(extend_offset_y)
-
-                        old_code_array[3] = str(extend_offset_x)
-                        old_code_array[4] = str(extend_offset_y)
-
-                    # 如果 x1,y1=x,y, 順便調整另一組。
-                    if old_code_array[1] == old_code_array[5] and old_code_array[2] == old_code_array[6]:
-                        old_code_array[1] = str(new_x1)
-                        old_code_array[2] = str(new_y1)
-
-                    # 如果 x2,y2=x,y, 順便調整另一組。
-                    if old_code_array[3] == old_code_array[5] and old_code_array[4] == old_code_array[6]:
-                        old_code_array[3] = str(new_x1)
-                        old_code_array[4] = str(new_y1)
-
-                    old_code_array[5] = str(new_x1)
-                    old_code_array[6] = str(new_y1)
-            else:
-                # not is 'c'
-                old_code_array[1] = str(new_x1)
-                old_code_array[2] = str(new_y1)
-            new_code = ' '.join(old_code_array)
-            target_index = (idx+1)%nodes_length
-            format_dict_array[target_index]['code'] = new_code
-            self.apply_code(format_dict_array,(idx+1)%nodes_length)
-    
-            #if True:
-            if False:
-                print("old_code_string:", old_code_string)
-                print("is_prefer_y1_straight:", is_prefer_y1_straight)
-                print("+1 idx:%d, code:%s" % (target_index, new_code))
+            # PS: 由於 halfmoon + toothpaste 沒有動 idx+1 curver.
+            self.move_round_idx_1_position(is_apply_inside_direction,new_x1,new_y1,x1_offset,y1_offset,format_dict_array,idx,apply_rule_log,generate_rule_log)
 
             # update #2
             #new_code = ' %d %d %d %d %d %d c 1\n' % (new_x1, new_y1, x1, y1, center_x, center_y)
@@ -1371,10 +1393,12 @@ class Rule():
             dot_dict['y2']=y1
 
             dot_dict['code']=new_code
+
             target_index = (idx+2)%nodes_length
             old_code = format_dict_array[target_index]['code']
             format_dict_array[target_index]=dot_dict
-            self.apply_code(format_dict_array,(idx+2)%nodes_length)
+            self.apply_code(format_dict_array,target_index)
+
             #print("update +2 old_code:", old_code)
             #print("update +2 idx:%d, code:%s" % (target_index, new_code))
             apply_rule_log.append(new_code)
@@ -1387,7 +1411,7 @@ class Rule():
             #center_x, center_y = spline_util.two_point_extend(x1,y1,orig_x0,orig_y0,-2)
             #center_x, center_y = spline_util.two_point_extend_next(orig_x0,orig_y0,x1,y1)
             center_x, center_y = x1,y1
-            
+
             # update #2
             new_code = ' %d %d l 1\n' % (center_x, center_y)
             dot_dict={}
@@ -1413,7 +1437,6 @@ class Rule():
         format_dict_array.insert(target_index,dot_dict)
         #print("insert +3 idx:%d, code:%s" % (target_index, new_code))
         # PS: alought we add new node, but please don't add idx+3 to generat_rule_log or apply_rule_log!
-        
 
         return center_x,center_y
 
@@ -1424,16 +1447,16 @@ class Rule():
 
         center_x = int((format_dict_array[(idx+1)%nodes_length]['x']+format_dict_array[(idx+2)%nodes_length]['x'])/2)
         center_y = int((format_dict_array[(idx+1)%nodes_length]['y']+format_dict_array[(idx+2)%nodes_length]['y'])/2)
-        
+
         x0 = format_dict_array[(idx+0)%nodes_length]['x']
         y0 = format_dict_array[(idx+0)%nodes_length]['y']
-        
+
         x1 = format_dict_array[(idx+1)%nodes_length]['x']
         y1 = format_dict_array[(idx+1)%nodes_length]['y']
-        
+
         x2 = format_dict_array[(idx+2)%nodes_length]['x']
         y2 = format_dict_array[(idx+2)%nodes_length]['y']
-        
+
         x3 = format_dict_array[(idx+3)%nodes_length]['x']
         y3 = format_dict_array[(idx+3)%nodes_length]['y']
 
@@ -1450,10 +1473,10 @@ class Rule():
 
         # 使用較短的邊。
         round_length_1 = self.config.ROUND_OFFSET
-        if format_dict_array[(idx+0)%nodes_length]['distance'] < self.config.ROUND_OFFSET:
+        if format_dict_array[(idx+0)%nodes_length]['distance'] < round_length_1:
             round_length_1 = format_dict_array[(idx+0)%nodes_length]['distance']
         round_length_2 = self.config.ROUND_OFFSET
-        if format_dict_array[(idx+2)%nodes_length]['distance'] < self.config.ROUND_OFFSET:
+        if format_dict_array[(idx+2)%nodes_length]['distance'] < round_length_2:
             round_length_2 = format_dict_array[(idx+2)%nodes_length]['distance']
 
         # use more close coordinate.
@@ -1463,7 +1486,7 @@ class Rule():
             x_center = format_dict_array[(idx+1)%nodes_length]['x2']
             y_center = format_dict_array[(idx+1)%nodes_length]['y2']
             x0,y0 = self.compute_curve_new_xy(x_from,y_from,x_center,y_center,x1,y1,round_length_1)
-        
+
         if format_dict_array[(idx+3)%nodes_length]['t']=='c':
             x_from = x3
             y_from = y3
@@ -1531,7 +1554,88 @@ class Rule():
         generate_rule_log.append(new_code)
 
         return center_x,center_y
-    
+
+
+    # for rectangel version. ex: rule#1,#2,#3
+    def apply_gospel_transform(self,format_dict_array,idx,apply_rule_log,generate_rule_log):
+        # PS: 目前 GOSPEL 不會使用到 BAT 的效果。
+        #     但由於code 想要共用，所以暫時以常數來解決code共用問題.
+        is_apply_inside_direction = True
+
+        nodes_length = len(format_dict_array)
+
+        center_x = int((format_dict_array[(idx+1)%nodes_length]['x']+format_dict_array[(idx+2)%nodes_length]['x'])/2)
+        center_y = int((format_dict_array[(idx+1)%nodes_length]['y']+format_dict_array[(idx+2)%nodes_length]['y'])/2)
+
+        x0 = format_dict_array[(idx+0)%nodes_length]['x']
+        y0 = format_dict_array[(idx+0)%nodes_length]['y']
+
+        x1 = format_dict_array[(idx+1)%nodes_length]['x']
+        y1 = format_dict_array[(idx+1)%nodes_length]['y']
+
+        x2 = format_dict_array[(idx+2)%nodes_length]['x']
+        y2 = format_dict_array[(idx+2)%nodes_length]['y']
+
+        x3 = format_dict_array[(idx+3)%nodes_length]['x']
+        y3 = format_dict_array[(idx+3)%nodes_length]['y']
+
+        # keep original value.
+        orig_x0 = x0
+        orig_y0 = y0
+        orig_x3 = x3
+        orig_y3 = y3
+
+        # PS: in this rule, the value is fixed.
+        #     but in Rule5, this value will be change.
+        orig_x2 = x2
+        orig_y2 = y2
+
+        # 使用較短的邊。
+        round_length_1 = self.config.INSIDE_ROUND_OFFSET
+        if format_dict_array[(idx+0)%nodes_length]['distance'] < round_length_1:
+            round_length_1 = format_dict_array[(idx+0)%nodes_length]['distance']
+
+        # use more close coordinate.
+        new_x1, new_y1 = 0,0
+        if format_dict_array[(idx+1)%nodes_length]['t']=='c':
+            x_from = x0
+            y_from = y0
+            x_center = format_dict_array[(idx+1)%nodes_length]['x2']
+            y_center = format_dict_array[(idx+1)%nodes_length]['y2']
+            x0,y0 = self.compute_curve_new_xy(x_from,y_from,x_center,y_center,x1,y1,round_length_1)
+            # 應該是可以直接使用 x0,y0才對，但目前還有問題。
+            #new_x1, new_y1 = x0, y0
+            if is_apply_inside_direction:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1,-1 * round_length_1)
+            else:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1, round_length_1)
+        else:
+            if is_apply_inside_direction:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1,-1 * round_length_1)
+            else:
+                new_x1, new_y1 = spline_util.two_point_extend(x0,y0,x1,y1, round_length_1)
+
+        x1_offset = new_x1 - x1
+        y1_offset = new_y1 - y1
+
+        self.move_round_idx_1_position(is_apply_inside_direction,new_x1,new_y1,x1_offset,y1_offset,format_dict_array,idx,apply_rule_log,generate_rule_log)
+
+        gospel_x, gospel_y = spline_util.two_point_extend(x2,y2,x1,y1, self.config.INSIDE_ROUND_OFFSET)
+
+        # update #2
+        new_code = ' %d %d l 1\n' % (gospel_x, gospel_y)
+        dot_dict={}
+        dot_dict['x']=gospel_x
+        dot_dict['y']=gospel_y
+        dot_dict['t']='l'
+        dot_dict['code']=new_code
+        format_dict_array.insert((idx+2)%nodes_length,dot_dict)
+        #format_dict_array[(idx+2)%nodes_length]=dot_dict
+        self.apply_code(format_dict_array,(idx+2)%nodes_length)
+        apply_rule_log.append(new_code)
+        generate_rule_log.append(new_code)
+
+        return center_x,center_y
 
     # PS: 數學沒學好，所以開始亂寫，這應該是用函數來處理的。
     def compute_curve_with_bonus(self, x_from, y_from, x_end, y_end, round_offset, x_center,y_center):
@@ -1604,7 +1708,7 @@ class Rule():
     # 角度的影響，修改為取決於距離長度。
     def compute_curve_new_xy(self,x_from,y_from,x_center,y_center,x_end,y_end,round_offset):
         distance_full = spline_util.get_distance(x_from,y_from,x_end,y_end)
-        
+
         x_middle = (x_from + x_end) / 2
         y_middle = (y_from + y_end) / 2
 
@@ -1790,7 +1894,7 @@ class Rule():
                     is_match_pattern = True
                     going_up = True
 
-            # for > sharp. 
+            # for > sharp.
             if format_dict_array[(idx+1)%nodes_length]['y_direction'] < 0:
                 fail_code = 2204
                 is_match_pattern = True
@@ -1802,7 +1906,7 @@ class Rule():
     # purpose: check for toothpaste base rule.
     # return:
     #   True: match,
-    #   False: not match, 
+    #   False: not match,
     def going_toothpaste(self, format_dict_array, idx):
         going_direction = False
         is_match_pattern = False

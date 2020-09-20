@@ -59,7 +59,7 @@ class Rule(Rule.Rule):
                 #is_debug_mode = True
 
                 if is_debug_mode:
-                    debug_coordinate_list = [[764,94]]
+                    debug_coordinate_list = [[829,-73]]
                     if not([format_dict_array[(idx+0)%nodes_length]['x'],format_dict_array[(idx+0)%nodes_length]['y']] in debug_coordinate_list):
                         continue
 
@@ -72,7 +72,12 @@ class Rule(Rule.Rule):
 
                 # for:脚 811A「月」slide_percent_1: 0.84
                 SLIDE_1_PERCENT_MIN = 0.50
-                SLIDE_1_PERCENT_MAX = 1.80
+                # for:蝙(uni8759)的戶，slide_percent_1: 1.81
+                SLIDE_1_PERCENT_MAX = 1.86
+
+
+                #TODO: 應該要檢查 SLIDE_1 + SLIDE_2 total max value.
+                #  PS: 目前還沒有檢查。
 
                 slide_percent_1 = spline_util.slide_percent(format_dict_array[(idx+0)%nodes_length]['x'],format_dict_array[(idx+0)%nodes_length]['y'],format_dict_array[(idx+1)%nodes_length]['x'],format_dict_array[(idx+1)%nodes_length]['y'],format_dict_array[(idx+2)%nodes_length]['x'],format_dict_array[(idx+2)%nodes_length]['y'])
                 slide_percent_2 = spline_util.slide_percent(format_dict_array[(idx+1)%nodes_length]['x'],format_dict_array[(idx+1)%nodes_length]['y'],format_dict_array[(idx+2)%nodes_length]['x'],format_dict_array[(idx+2)%nodes_length]['y'],format_dict_array[(idx+3)%nodes_length]['x'],format_dict_array[(idx+3)%nodes_length]['y'])
@@ -89,6 +94,7 @@ class Rule(Rule.Rule):
                                 if (format_dict_array[(idx+1)%nodes_length]['distance']+format_dict_array[(idx+2)%nodes_length]['distance']) >= 30:
                                     if (format_dict_array[(idx+1)%nodes_length]['distance']+format_dict_array[(idx+2)%nodes_length]['distance']) <= 120:
                                         check_more_merge_stroke_condition = True
+
                 #print("check_more_merge_stroke_condition 1:", check_more_merge_stroke_condition)
                 if check_more_merge_stroke_condition:
                     check_more_merge_stroke_condition = False
@@ -117,6 +123,7 @@ class Rule(Rule.Rule):
                         # for:脚 811A「月」slide_percent_2: 1.98
                         if slide_percent_2 >= 1.96:
                             check_more_merge_stroke_condition = True
+
                 #print("check_more_merge_stroke_condition 5:", check_more_merge_stroke_condition)
                 if check_more_merge_stroke_condition:
                     # start to merge line.
@@ -187,14 +194,22 @@ class Rule(Rule.Rule):
                 # check slide#1
                 # 去除部份情況
                 if is_match_pattern:
+                    fail_code = 220
                     if slide_percent_1 < SLIDE_1_PERCENT_MIN:
                         is_match_pattern = False
+                        if is_debug_mode:
+                            print("slide_percent_1:",slide_percent_1)
+                            print("SLIDE_1_PERCENT_MIN:",SLIDE_1_PERCENT_MIN)
                     if slide_percent_1 > SLIDE_1_PERCENT_MAX:
                         is_match_pattern = False
+                        if is_debug_mode:
+                            print("slide_percent_1:",slide_percent_1)
+                            print("SLIDE_1_PERCENT_MAX:",SLIDE_1_PERCENT_MAX)
 
                 # 做例外排除.
                 # PS: 請不要判斷 (idx+2) and (idx+3), 因為超過矩形範圍。
                 if is_match_pattern:
+                    fail_code = 230
                     if format_dict_array[(idx+0)%nodes_length]['y_equal_fuzzy']:
                         if format_dict_array[(idx+1)%nodes_length]['y_equal_fuzzy']:
                             is_match_pattern = False
@@ -216,9 +231,37 @@ class Rule(Rule.Rule):
                     fail_code = 400
                     #print(idx,"debug rule3:",format_dict_array[idx]['code'])
                     is_match_pattern = False
+
+                    #print("0 x_direction:",format_dict_array[(idx+0)%nodes_length]['x_direction'])
+                    #print("2 x_direction:",format_dict_array[(idx+2)%nodes_length]['x_direction'])
                     if format_dict_array[(idx+0)%nodes_length]['x_direction'] == -1 * format_dict_array[(idx+2)%nodes_length]['x_direction']:
-                        if format_dict_array[(idx+0)%nodes_length]['y_direction'] == -1 * format_dict_array[(idx+2)%nodes_length]['y_direction']:
-                            is_match_pattern = True
+                        if not is_match_pattern:
+                            fail_code = 410
+                            # for normal case.
+                            if format_dict_array[(idx+0)%nodes_length]['y_direction'] == -1 * format_dict_array[(idx+2)%nodes_length]['y_direction']:
+                                is_match_pattern = True
+
+                        # for uni89D2,角 Black Style ... start.
+                        if not is_match_pattern:
+                            fail_code = 420
+                            # best case, but not every time is lucky.
+                            if format_dict_array[(idx+0)%nodes_length]['y_equal_fuzzy'] and format_dict_array[(idx+2)%nodes_length]['y_equal_fuzzy']:
+                                is_match_pattern = True
+                        if not is_match_pattern:
+                            fail_code = 430
+                            # +2 水平，檢查 +0 是否貼齊。
+                            #print("+2 y_equal_fuzzy:", format_dict_array[(idx+2)%nodes_length]['y_equal_fuzzy'])
+                            if format_dict_array[(idx+2)%nodes_length]['y_equal_fuzzy']:
+                                if format_dict_array[(idx+1)%nodes_length]['t']=='c':
+                                    if abs(format_dict_array[(idx+1)%nodes_length]['y']-format_dict_array[(idx+1)%nodes_length]['y2'])<=3:
+                                        is_match_pattern = True
+                            # +0 水平，檢查 +2 是否貼齊。
+                            #print("+0 y_equal_fuzzy:", format_dict_array[(idx+0)%nodes_length]['y_equal_fuzzy'])
+                            if format_dict_array[(idx+0)%nodes_length]['y_equal_fuzzy']:
+                                if format_dict_array[(idx+2)%nodes_length]['t']=='c':
+                                    if abs(format_dict_array[(idx+2)%nodes_length]['y']-format_dict_array[(idx+1)%nodes_length]['y1'])<=3:
+                                        is_match_pattern = True
+                        # for uni89D2,角 ... end.
 
                     # 追加例外：源 的下面小的水平腳
                     # 下面的 code, 直接讓 match=True, 需要小心處理！
@@ -343,6 +386,12 @@ class Rule(Rule.Rule):
                         is_match_d_base_rule, fail_code = self.going_rainbow_up(format_dict_array,idx)
                         is_goto_apply_round = is_match_d_base_rule
 
+                    # for BOW
+                    if self.config.PROCESS_MODE in ["BOW","CURVE","DEL"]:
+                        generated_code = format_dict_array[(idx+1)%nodes_length]['code']
+                        apply_rule_log.append(generated_code)
+                        is_goto_apply_round = False
+
                     # NUT8, alway do nothing but record the history.
                     if self.config.PROCESS_MODE in ["NUT8"]:
                         is_goto_apply_round = False
@@ -353,10 +402,18 @@ class Rule(Rule.Rule):
                     if is_goto_apply_round:
                         center_x,center_y = -9999,-9999
                         #print("self.config.PROCESS_MODE:", self.config.PROCESS_MODE)
-                        if not self.config.PROCESS_MODE in ["3TSANS"]:
-                            center_x,center_y = self.apply_round_transform(format_dict_array,idx,apply_rule_log,generate_rule_log)
-                        else:
+
+                        is_special_round_format = False
+                        if self.config.PROCESS_MODE in ["3TSANS"]:
+                            is_special_round_format = True
                             center_x,center_y = self.apply_3t_transform(format_dict_array,idx,apply_rule_log,generate_rule_log)
+                        if self.config.PROCESS_MODE in ["GOSPEL"]:
+                            is_special_round_format = True
+                            center_x,center_y = self.apply_gospel_transform(format_dict_array,idx,apply_rule_log,generate_rule_log)
+
+                        # default use round.                       
+                        if not is_special_round_format:
+                            center_x,center_y = self.apply_round_transform(format_dict_array,idx,apply_rule_log,generate_rule_log)
                         #print("center_x,center_y:",center_x,center_y)
 
                     redo_travel=True
